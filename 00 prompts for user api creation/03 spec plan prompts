@@ -1,0 +1,162 @@
+Create a comprehensive engineering plan for building a production-grade User Service API using FastAPI and Supabase.
+
+Context:
+- Backend: FastAPI (Python)
+- Database/Auth: Supabase (PostgreSQL + JWT Auth)
+- System Type: Multi-tenant SaaS platform
+- Priority: Security, scalability, testability, and compliance
+
+Objectives:
+- Design a robust User Service that supports multi-tenancy, RBAC, and audit logging
+- Ensure production readiness with clear implementation phases
+- Provide a roadmap that aligns engineering, QA, and DevOps
+
+Scope:
+- User management
+- Tenant management
+- Role-based access control (RBAC)
+- Authentication & authorization (Supabase JWT)
+- Audit/compliance logging
+
+---
+
+Planning Requirements:
+
+1. Architecture Overview
+- Define system architecture (layers: API, service, repository)
+- Describe interaction with Supabase (DB + Auth)
+- Multi-tenant isolation strategy (RLS, tenant_id propagation)
+- RBAC enforcement model (middleware/dependencies)
+
+2. Domain Modeling
+- Core entities:
+  - Tenant, User, Membership
+  - Role, Permission, RolePermission
+  - AuditLog
+- Relationships and constraints
+- Data ownership and tenant boundaries
+
+3. API Design Strategy
+- Endpoint grouping and versioning (/v1)
+- REST conventions and naming
+- Pagination, filtering, sorting standards
+- Error handling contract
+
+4. Security & Compliance Plan
+- Authentication flow (Supabase JWT lifecycle)
+- Authorization (RBAC + permission checks)
+- Row-Level Security (RLS) policies
+- Compliance:
+  - Audit trails (who/what/when)
+  - GDPR considerations (data access & deletion)
+- Threat modeling (OWASP risks)
+
+5. Data Strategy
+- PostgreSQL schema design (multi-tenant optimized)
+- Indexing strategy
+- Migration/versioning approach
+- Soft delete + audit fields
+
+6. Implementation Phases (Milestones)
+Break down into phases with deliverables:
+- Phase 0: Project setup (FastAPI structure, CI/CD)
+- Phase 1: Auth integration (Supabase)
+- Phase 2: Core User APIs
+- Phase 3: Multi-tenancy enforcement
+- Phase 4: RBAC system
+- Phase 5: Audit logging
+- Phase 6: Hardening (security, rate limiting)
+- Phase 7: Observability (logging, metrics)
+
+Each phase should include:
+- Goals
+- Key tasks
+- Dependencies
+- Risks
+
+7. Test Strategy (SDET-focused)
+- Define:
+  - Unit tests (service layer)
+  - Integration tests (API + DB)
+  - Contract tests (OpenAPI validation)
+  - Security tests (RBAC, tenant isolation)
+- Test data management (fixtures, seeding)
+- Mocking strategy for Supabase
+- CI/CD test gates
+
+8. Observability & Operations
+- Logging (structured, trace IDs)
+- Monitoring (latency, errors)
+- Alerting strategy
+- Deployment strategy (staging → production)
+
+9. Performance & Scalability
+- Query optimization (avoid N+1)
+- Pagination strategy (cursor-based)
+- Load considerations
+- Horizontal scaling approach
+
+10. Risks & Trade-offs
+- Identify key risks:
+  - Multi-tenant data leakage
+  - RBAC complexity
+  - Supabase limitations
+- Mitigation strategies
+
+11. Deliverables
+- OpenAPI spec
+- DB schema (DDL)
+- FastAPI project structure
+- RLS policy definitions
+- Test plan and sample cases
+
+---
+
+Output Format:
+- Structured engineering plan document
+- Clear section headers
+- Bullet points + concise explanations
+- Include diagrams (textual if needed)
+- Include a timeline (rough estimates per phase)
+
+
+
+=============================================================================
+Upon the input of the above prompt, the OpenCode AI follows SpecKit rules to generate a spec plan document with these thinking process:
+
+1. Analyze the prompt and identify the core requirements.
+2. Break down the requirements into smaller, manageable tasks.
+3. Design the architecture and data model.
+4. Implement the API and database schema.
+5. Test the API and database schema.
+6. Document the API and database schema.
+7. Review and refine the API and database schema.
+8. Generate the spec plan document.
+
+Thinking: Defining the Objective
+Okay, I'm focusing on the user's overarching goal: a robust engineering plan for a production-ready User Service API. It must be built with FastAPI and Supabase, and crucially, incorporate multi-tenancy, RBAC, and auditing. I'm starting to visualize the architectural components and the necessary considerations for each.
+Analyzing the Workflow
+I'm now deep in the execution phase, specifically steps 1 through 3. I'm running setup scripts and parsing JSON output to load templates. I'm populating the implementation plan with technical context and checking the "constitution" at various stages. I am generating research documents, data models, contracts, and quickstart guides as part of Phase 0 and Phase 1, updating the agent context throughout the process. I am also currently re-evaluating the constitution check.
+
+Thinking: Defining the Process
+Okay, I'm making headway on the planning. I've broken it down: First, I'm populating the plan.md template. After that, I'll dive into Phase 0, pulling out the unknowns from the Technical Context for a research.md document. Next, Phase 1 entails entity extraction to create data-model.md, a contracts/ directory, and the initial quickstart.
+Clarifying the Technical Context
+Okay, I'm focusing on Phase 0 and the initial research. The user's specification of a production-grade User Service API using FastAPI and Supabase is providing the guiding light. I've begun to pull out the unknowns for the research.md document, and am zeroing in on a couple of "needs clarification" items in the Technical Context. These uncertainties center around authenticating FastAPI with Supabase Auth and enforcing Row-Level Security from the backend. The technical context is becoming clear.
+Defining Research Tasks
+Okay, I've articulated the research tasks for Phase 0 based on unknowns within the Technical Context. I'm focusing on three key areas for research.md: multi-tenant RLS propagation from FastAPI to Supabase, validating Supabase JWTs in FastAPI, and implementing RBAC within a multi-tenant Supabase environment. Now, I should generate and dispatch research agents to investigate these topics, as per the instruction.
+
+Thinking: Initiating Design Phase
+I'm now in Phase 1: Design & Contracts. I've noted the research prerequisites are done. I'm extracting entities from the feature spec into data-model.md. My focus is on the spec.md entities, which starts with Tenant (id, name, etc.). I'll outline other relevant data, as needed.
+
+Thinking: Defining Interface Contracts
+I'm currently focused on defining the interface contracts. I've begun identifying the project's external interfaces and plan to create contracts. My initial focus is on the web services and corresponding endpoints, so I'm investigating how best to document the appropriate contract format for these.
+
+Thinking: Considering Windows Alternatives
+I'm now thinking about the Windows environment and realizing mkdir isn't the best approach. Instead, I'll use either New-Item in PowerShell, which seems more direct, or mkdir but it looks like I will need to check if it's really needed to do mkdir -p. I've noted that all the commands are running in C:\Users\linma\workspace\02-learning-.
+
+Thinking: Re-evaluating Post-Design
+I've been re-evaluating the constitution check, and I'm currently focused on the post-design implications. I've documented my findings in research.md, which outlines the auth context using the Supabase client as requested, and DB-level audit logs. I'm also reviewing the data-model.md, including tenant, user_profile, membership, role, permission, role_permission, and audit_log mappings.
+Confirming Compliance Checklist
+I've confirmed that everything maps securely and respects RBAC, RLS, and API-First principles. The test coverage target is noted. It seems the constitution check is passing. I'm now double-checking step 4, the "Stop and report" phase. I'm noting the instructions and planning to proceed accordingly, since the extensions file check is already accounted for.
+Clarifying Phase Definition
+I'm now clarifying the Phase definitions. It seems the instructions only explicitly define Phase 0 and Phase 1 tasks, even though the command ends after Phase 2 planning. I've re-read the prompt and the IMPL_PLAN template, and it seems Phase 2 usually generates tasks.md, however it's not created by the /speckit.plan command. I'm noting this distinction.

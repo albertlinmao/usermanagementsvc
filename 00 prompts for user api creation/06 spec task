@@ -1,0 +1,52 @@
+The /speckit.tasks workflow has been successfully completed using the updated architectural plan. I have completely re-mapped the tasks to directly implement the missing constitutional requirements.
+Output File: C:\Users\linma\workspace\02-learning-AI\api\user-management\specs\001-multi-tenant-user-api\tasks.md
+Task Remediation Summary
+The newly generated task list explicitly addresses the previous critical gaps:
+- Feature Flags: Added core FF provider logic (T010) and explicitly wrapped the endpoints in User Stories 2, 3, and 4 (T022, T026, T030) behind feature flags for gradual rollouts.
+- Supabase Vault & PII Encryption: Added database setup tasks (T006) to enable pgcrypto and integrate Vault. Refactored the UserProfile repository tasks (T014, T024) to utilize pgp_sym_encrypt/decrypt for sensitive fields.
+- K8s Pipelines: Created a dedicated Polish & CI/CD Phase 7 that introduces GitHub Actions CI (T031), Kubernetes Helm/manifests (T032), and GitHub Actions Deploy pipelines (T033).
+Task Statistics
+- Total Tasks: 35
+- Task Count per Phase:
+  - Setup/Foundational: 11 tasks
+  - US1 (Tenant Onboarding): 6 tasks
+  - US2 (RBAC): 5 tasks
+  - US3 (Lifecycle): 4 tasks
+  - US4 (Audit & GDPR): 4 tasks
+  - Polish & CI/CD: 5 tasks
+- Parallel Opportunities: Identified 13 parallelizable tasks (marked with [P]).
+Format Validation
+✅ Verified that ALL tasks correctly follow the strict checklist format (- [ ] TXXX [P] [US#] Description with exact file path), with User Story labels properly excluded from the Setup, Foundational, and Polish phases.
+You are now fully prepared and constitutionally compliant to begin implementation! You can feed individual tasks directly to an implementation agent.
+
+
+=======================================================
+In the first spec task, I mentioned that the tasks are grouped by user story to enable independent implementation and testing of each story, specifically tailored for a pure self-hosted Supabase Docker Desktop environment without CLI dependencies.
+
+So, I have re-mapped the tasks to directly implement the missing constitutional requirements. Please review the updated task list and let me know if you have any questions.
+Here is the reqested prompt I used to re-generate and update the task list:
+
+## User Input
+```text
+re-build the implementation for tasks phase 1, all supabase setup scripts in backend/supabase folder can be created or generated from the scripts in ./user-management/superbase folder 
+```
+
+Phase 1 Execution Summary
+I have executed and verified the Phase 1 steps matching your self-hosted Docker workflow. 
+1. T001 Python Backend Initialization: COMPLETE 
+   - Created backend/pyproject.toml using poetry-core with FastAPI, Uvicorn, Pydantic, Supabase, PyJWT, and Pytest dependencies.
+   - Synchronized backend/requirements.txt based on the configuration.
+   - Scaffolded the baseline app at backend/src/api/main.py.
+2. T002 Supabase Local Configuration: COMPLETE 
+   - Verified that supabase/docker-compose.yml exists. 
+   - Verified supabase/.env is properly populated (created via ./supabase/reset.sh). 
+   - Note: Fixed tasks.md to map Edge functions to supabase/volumes/functions/ and migrations to supabase/volumes/db/init/ to accurately reflect your docker-compose.yml mappings.
+3. T003 FastAPI Local Development Orchestration: COMPLETE
+   - Created backend/Dockerfile (using python:3.11-slim).
+   - Created backend/docker-compose.yml mapping src and tests directories, listening on port 8080 (to avoid conflicting with Supabase's API gateway on 8000).
+   - Created a .env specific for your backend mapped to Supabase.
+4. T004 Pytest Configuration: COMPLETE
+   - Wrote backend/pytest.ini with unit and integration markers.
+   - Wrote backend/tests/conftest.py with mock gateway fixtures (injecting simulated Edge proxy headers like X-Gateway-PSK and X-Tenant-Id).
+All tasks in tasks.md for Phase 1 are marked as complete ([x]). 
+=======================================================

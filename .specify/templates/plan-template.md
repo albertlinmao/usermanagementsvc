@@ -31,7 +31,11 @@
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-[Gates determined based on constitution file]
+- [ ] **I. Supabase-Centric & API-First**: Does the design leverage Supabase services properly and follow an API-first semantic versioning approach?
+- [ ] **II. TDD & Reliability**: Are tests designed test-first? Are SLA latency/uptime targets and graceful degradation accounted for?
+- [ ] **III. Data & Consistency**: Are consistency trade-offs, schema evolution, and RLS policies correctly planned?
+- [ ] **IV. Security & Compliance**: Are IAM/RBAC, PII handling, and secrets management clearly defined?
+- [ ] **V. Observability & Operability**: Are structured logging, tracing, and metrics included in the design?
 
 ## Project Structure
 

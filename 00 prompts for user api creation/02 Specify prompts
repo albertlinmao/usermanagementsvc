@@ -1,0 +1,136 @@
+Design a production-grade, multi-tenant User Service API using FastAPI and Supabase.
+
+Architecture Requirements:
+- Follow clean architecture:
+  - API Layer (FastAPI routers)
+  - Service Layer (business logic)
+  - Repository Layer (Supabase/PostgreSQL access)
+- Dependency injection for services and auth
+- Modular design for testability and scalability
+
+Multi-Tenancy Model:
+- Support multi-tenant SaaS architecture
+- Entities:
+  - Tenant (id, name, status)
+  - User (id, tenant_id, email, full_name, status)
+  - Membership (user_id, tenant_id, role_id)
+- Enforce tenant isolation at all layers
+- All queries must be tenant-scoped
+- Support tenant-level configuration
+
+RBAC + Permissions:
+- Role-based access control with fine-grained permissions
+- Entities:
+  - Role (id, name, tenant_id)
+  - Permission (id, resource, action)
+  - RolePermission mapping
+- Support:
+  - System roles (global)
+  - Tenant roles (scoped)
+- Authorization:
+  - JWT-based (Supabase Auth)
+  - Middleware/dependencies to enforce permissions
+- Example permissions:
+  - user.read, user.write, user.delete, tenant.admin
+
+API Endpoints:
+- Auth:
+  - POST /auth/signup
+  - POST /auth/login
+  - GET /auth/me
+- Tenants:
+  - POST /tenants
+  - GET /tenants/{id}
+- Users:
+  - POST /users
+  - GET /users/{id}
+  - GET /users (filter by tenant, role, status)
+  - PUT /users/{id}
+  - DELETE /users/{id} (soft delete)
+- Roles & Permissions:
+  - CRUD /roles
+  - CRUD /permissions
+  - Assign roles to users
+
+Data & Schema:
+- PostgreSQL (Supabase) schema design
+- UUID primary keys
+- Audit fields:
+  - created_at, updated_at
+  - created_by, updated_by
+- Soft delete:
+  - deleted_at (nullable)
+- Indexing strategy for multi-tenant queries
+
+Audit & Compliance:
+- Full audit trail for:
+  - user changes
+  - role/permission changes
+  - authentication events
+- Audit log schema:
+  - id, actor_id, action, resource, resource_id, timestamp, metadata
+- Support compliance requirements:
+  - GDPR (data access & deletion)
+  - Immutable audit logs
+- Track:
+  - who did what, when, and from where (IP optional)
+
+Security:
+- Supabase JWT authentication
+- Row-Level Security (RLS) policies for tenant isolation
+- Input validation (Pydantic)
+- OWASP best practices
+- Rate limiting
+- Secrets management (no hardcoded secrets)
+
+Error Handling:
+- Standard error model:
+  - code, message, details, trace_id
+- Consistent HTTP status usage
+- Validation vs business logic errors separation
+
+Testability (SDET-focused):
+- API must be test-friendly:
+  - Deterministic responses
+  - Idempotent endpoints where applicable
+- Include:
+  - Test scenarios for each endpoint
+  - Mocking strategy for Supabase
+  - Dependency override patterns (FastAPI)
+- Define:
+  - Unit tests (service layer)
+  - Integration tests (API + DB)
+  - Contract tests (OpenAPI validation)
+- Provide sample test cases:
+  - Auth flows
+  - RBAC enforcement
+  - Tenant isolation
+- Include test data seeding strategy
+
+Observability:
+- Structured logging (JSON)
+- Correlation/trace IDs
+- Metrics hooks (latency, error rates)
+- Audit logs integration
+
+Performance & Scalability:
+- Pagination (cursor-based preferred)
+- Filtering and sorting
+- Indexing recommendations
+- Avoid N+1 queries
+- Async support (FastAPI)
+
+Output Requirements:
+1. OpenAPI 3.0 specification (YAML)
+2. Pydantic models (request/response)
+3. Suggested FastAPI folder structure
+4. Supabase/PostgreSQL schema (DDL)
+5. Example RLS policies
+6. Example middleware/dependencies (auth + RBAC)
+7. Sample test cases (pytest style)
+8. Example audit log entries
+
+Constraints:
+- No sensitive data in API responses
+- Passwords must be handled only via Supabase Auth
+- All endpoints must enforce tenant context

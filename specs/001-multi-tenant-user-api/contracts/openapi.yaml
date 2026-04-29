@@ -1,0 +1,530 @@
+openapi: 3.0.3
+info:
+  title: Multi-Tenant User Service API
+  description: >
+    A production-grade, multi-tenant User Service API integrating with Supabase. 
+    Provides full lifecycle management for tenants, users, roles, and permissions 
+    enforcing strict tenant isolation via JWT tokens.
+  version: 1.0.0
+servers:
+  - url: /api/v1
+    description: Current API version
+
+tags:
+  - name: Auth
+    description: Authentication operations
+  - name: Tenants
+    description: Tenant management operations
+  - name: Users
+    description: User management operations
+  - name: Roles
+    description: Role-Based Access Control (RBAC) roles
+  - name: Permissions
+    description: RBAC permissions
+
+paths:
+  /auth/signup:
+    post:
+      tags: [Auth]
+      summary: Register a new tenant and admin user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignupRequest'
+      responses:
+        '201':
+          description: Tenant and admin user successfully created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: Authenticate a user and return a JWT
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Successful authentication
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /auth/me:
+    get:
+      tags: [Auth]
+      summary: Get the currently authenticated user's profile
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Authenticated user details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /tenants:
+    post:
+      tags: [Tenants]
+      summary: Create a new tenant (System Admin only)
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TenantCreate'
+      responses:
+        '201':
+          description: Tenant created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tenant'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /tenants/{id}:
+    get:
+      tags: [Tenants]
+      summary: Retrieve a specific tenant's details
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PathId'
+      responses:
+        '200':
+          description: Tenant details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tenant'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  /users:
+    get:
+      tags: [Users]
+      summary: List users within the current tenant context
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: query
+          name: cursor
+          description: Cursor for pagination to avoid N+1 queries
+          schema:
+            type: string
+        - in: query
+          name: status
+          description: Filter by user status
+          schema:
+            type: string
+            enum: [active, inactive, suspended]
+        - in: query
+          name: role
+          description: Filter by role ID
+          schema:
+            type: string
+            format: uuid
+        - in: query
+          name: limit
+          description: Maximum number of items to return
+          schema:
+            type: integer
+            default: 50
+      responses:
+        '200':
+          description: A paginated list of users
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedUserResponse'
+
+    post:
+      tags: [Users]
+      summary: Create a new user in the current tenant
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCreate'
+      responses:
+        '201':
+          description: User successfully created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+
+  /users/{id}:
+    get:
+      tags: [Users]
+      summary: Get user details
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PathId'
+      responses:
+        '200':
+          description: User details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+    put:
+      tags: [Users]
+      summary: Update a user's profile
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PathId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserUpdate'
+      responses:
+        '200':
+          description: User successfully updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+    delete:
+      tags: [Users]
+      summary: Soft delete a user
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PathId'
+      responses:
+        '204':
+          description: User successfully soft-deleted
+
+  /roles:
+    get:
+      tags: [Roles]
+      summary: List roles for the current tenant
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: List of roles
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Role'
+    post:
+      tags: [Roles]
+      summary: Create a new role
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoleCreate'
+      responses:
+        '201':
+          description: Role created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Role'
+
+  /permissions:
+    get:
+      tags: [Permissions]
+      summary: List all available permissions
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: List of permissions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Permission'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    PathId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: The unique UUID of the resource
+
+  schemas:
+    # Entities
+    Tenant:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        status:
+          type: string
+          enum: [active, suspended]
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        tenant_id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        first_name:
+          type: string
+        last_name:
+          type: string
+        middle_name:
+          type: string
+        status:
+          type: string
+          enum: [active, inactive, suspended]
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    Role:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        tenant_id:
+          type: string
+          format: uuid
+          nullable: true
+
+    Permission:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        resource:
+          type: string
+          example: user
+        action:
+          type: string
+          example: read
+
+    # Requests
+    SignupRequest:
+      type: object
+      required: [tenant_name, email, password, first_name, last_name]
+      properties:
+        tenant_name:
+          type: string
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+        first_name:
+          type: string
+        last_name:
+          type: string
+        middle_name:
+          type: string
+
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+
+    TenantCreate:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+        status:
+          type: string
+          enum: [active, suspended]
+          default: active
+
+    UserCreate:
+      type: object
+      required: [email, first_name, last_name]
+      properties:
+        email:
+          type: string
+          format: email
+        first_name:
+          type: string
+        last_name:
+          type: string
+        middle_name:
+          type: string
+        role_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+
+    UserUpdate:
+      type: object
+      properties:
+        first_name:
+          type: string
+        last_name:
+          type: string
+        middle_name:
+          type: string
+        status:
+          type: string
+          enum: [active, inactive, suspended]
+
+    RoleCreate:
+      type: object
+      required: [name, permission_ids]
+      properties:
+        name:
+          type: string
+        permission_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+
+    # Responses
+    AuthResponse:
+      type: object
+      properties:
+        access_token:
+          type: string
+        token_type:
+          type: string
+          example: bearer
+        user:
+          $ref: '#/components/schemas/User'
+
+    PaginatedUserResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+        next_cursor:
+          type: string
+          nullable: true
+        has_more:
+          type: boolean
+
+    # Standard Error Model
+    ErrorModel:
+      type: object
+      properties:
+        code:
+          type: string
+          example: "VALIDATION_ERROR"
+        message:
+          type: string
+          example: "Invalid input parameters"
+        details:
+          type: object
+          additionalProperties: true
+        trace_id:
+          type: string
+          format: uuid
+
+  responses:
+    ValidationError:
+      description: Validation error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    UnauthorizedError:
+      description: Missing or invalid authentication token
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    ForbiddenError:
+      description: Insufficient permissions for this action (RBAC / Tenant Isolation)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+    NotFoundError:
+      description: Resource not found or isolated in another tenant
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'

@@ -95,6 +95,12 @@
 - **FR-006**: System MUST authenticate users via [NEEDS CLARIFICATION: auth method not specified - email/password, SSO, OAuth?]
 - **FR-007**: System MUST retain user data for [NEEDS CLARIFICATION: retention period not specified]
 
+### Non-Functional Requirements (Security, Performance, Observability)
+
+- **NFR-001**: System MUST [security requirement, e.g., "authenticate via Supabase Auth and enforce RLS policies"]
+- **NFR-002**: System MUST [observability requirement, e.g., "log all state-mutating operations with structured JSON logs and correlation IDs"]
+- **NFR-003**: System MUST [performance requirement, e.g., "maintain 99.9% uptime and <2s P95 response time"]
+
 ### Key Entities *(include if feature involves data)*
 
 - **[Entity 1]**: [What it represents, key attributes without implementation]

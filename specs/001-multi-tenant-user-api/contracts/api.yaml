@@ -1,0 +1,66 @@
+openapi: 3.0.0
+info:
+  title: Multi-Tenant User Service API
+  version: 1.0.0
+  description: Edge-proxied FastAPI backend for managing users, tenants, and roles.
+servers:
+  - url: http://localhost:54321/functions/v1/api
+    description: Supabase Edge API Gateway (Local)
+paths:
+  /users:
+    get:
+      summary: List users
+      description: Returns a paginated list of users scoped to the authenticated tenant.
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: A list of users.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/User'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden (Insufficient permissions)
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        first_name:
+          type: string
+        last_name:
+          type: string
+        status:
+          type: string
+          enum: [ACTIVE, INACTIVE, SOFT_DELETED]
+    Pagination:
+      type: object
+      properties:
+        total:
+          type: integer
+        page:
+          type: integer
+        page_size:
+          type: integer

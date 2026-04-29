@@ -1,0 +1,29 @@
+Now I want you to go and audit the implementation plan and the implementation detail files.
+Read through it with an eye on determining whether or not there is a sequence of tasks that you need
+to be doing that are obvious from reading this. Because I don't know if there's enough here. For example,
+when I look at the core implementation, it would be useful to reference the appropriate places in the implementation
+details where it can find the information as it walks through each step in the core implementation or in the refinement.
+
+===============
+Audit result:
+
+I have audited your implementation plan and details inside the specs/001-multi-tenant-user-api/ directory. 
+You had an excellent implementation sequence outlined in tasks.md, but you were right—there wasn't enough cross-referencing to make it obvious where the actual implementation details (from data-model.md, spec.md, and technical-artifacts.md) could be found during each step. 
+To resolve this, I have updated specs/001-multi-tenant-user-api/tasks.md by injecting explicit [Ref: ...] tags directly into the task descriptions. 
+Here is what was added for each phase:
+1. Foundational Layer (Phase 2):
+   * Database Schema (T005): Added references to data-model.md and technical-artifacts.md Section 4 for the DDL.
+   * Pgcrypto & Vault (T006): Added a reference to data-model.md (Data Isolation & Encryption).
+   * Audit Triggers (T007): Added references to data-model.md (audit_log entity) and technical-artifacts.md Section 8 for the sample log JSON.
+   * Edge Gateway & Auth Config (T008-T009): Added references to spec.md (FR-003) and technical-artifacts.md Section 6 (Middleware).
+   * SQLAlchemy & Idempotency (T011-T011b): Added references to data-model.md and spec.md (NFR-003).
+2. User Stories (Phases 3 - 6):
+   * Schemas & Endpoints: Tasks creating Pydantic schemas and endpoints now directly reference the OpenAPI specifications and code examples in technical-artifacts.md Sections 1 & 2. 
+   * Repositories & Business Logic: Tasks implementing DB repositories and soft-deletes now explicitly point to data-model.md (for the required tables and state transitions) and technical-artifacts.md Section 5 (for the required RLS policies).
+   * Testing: Testing tasks now point to the specific user stories in spec.md as well as the Pytest samples in technical-artifacts.md Section 7.
+3. Polish & CI/CD (Phase 7):
+   * Pipeline, K8s, and Rate Limiting tasks now explicitly reference their corresponding Non-Functional Requirements (NFRs) and Success Criteria in spec.md.
+Next Steps:
+When an agent or developer looks at tasks.md to begin work, they will now see exact signposts on each item (e.g., [Ref: data-model.md, technical-artifacts.md Section 4]), which allows them to just open the relevant section rather than guessing which file contains the related context.
+
+===============

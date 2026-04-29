@@ -1,0 +1,106 @@
+# 🛠️ Project Working Progress Log
+
+## 📌 Project Info
+- **Project Name**:
+- **Owner**:
+- **Start Date**:
+- **Repository**:
+- **Environment(s)**: (Dev / QA / Stage / Prod)
+
+---
+
+## 📅 Daily Progress
+
+---
+
+<details>
+<summary><strong>🗓️ YYYY-MM-DD (Day X) — [Status] — Short summary of the day</strong></summary>
+
+### **Summary**
+- High-level overview of the day
+- Key outcomes / milestones reached
+
+### **Status**
+- 🟢 On Track / 🟡 At Risk / 🔴 Blocked
+
+### **Work Items**
+- [ ] Task 1
+- [ ] Task 2
+- [x] Completed Task
+
+### **Key Changes**
+- Brief description of code/design changes
+- PR links (if any)
+
+### **Blockers / Risks**
+- Issue 1
+- Dependency / external blocker
+
+### **Next Steps**
+- Plan for next day
+
+---
+
+<details>
+<summary>🔍 Detailed Working Notes</summary>
+
+#### 💻 Development Details
+- Modules worked on:
+- APIs implemented/updated:
+- DB changes (schema, migrations):
+- Config / Infra changes:
+
+#### 🧪 Testing
+- Unit tests added:
+- Integration tests:
+- Manual validation notes:
+
+#### 🚀 Deployment
+- Build version:
+- Deployment steps:
+- Environment:
+- Issues during deploy:
+
+#### 📊 Observations / Metrics
+- Performance notes:
+- Logs / errors:
+- Monitoring insights:
+
+#### 🧠 Decisions / Trade-offs
+- Decision made:
+- Alternatives considered:
+- Reasoning:
+
+#### 🧾 References
+- JIRA:
+- PR:
+- Design Doc:
+
+</details>
+
+</details>
+
+---
+
+## 📈 Weekly Summary (Optional)
+
+### Week: YYYY-MM-DD → YYYY-MM-DD
+
+**Achievements**
+- 
+
+**Challenges**
+- 
+
+**Improvements**
+- 
+
+---
+
+## 🧩 Backlog / Parking Lot
+- Ideas, improvements, or deferred work
+
+---
+
+## 📎 Notes
+- General observations or recurring patterns

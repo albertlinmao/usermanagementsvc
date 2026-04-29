@@ -1,0 +1,1 @@
+{"name": "user-management", "version": "0.1.0", "dependencies": {"fastapi": "^0.109.2", "uvicorn": "^0.27.1", "sqlalchemy": "^2.0.25", "alembic": "^1.13.1", "pydantic": "^2.6.1", "pydantic-settings": "^2.1.0", "supabase": "^2.3.4", "pyjwt": "^2.8.0"}}
