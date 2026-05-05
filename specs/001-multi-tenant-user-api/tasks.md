@@ -80,14 +80,14 @@
 
 ### Tests for User Story 2 ⚠️
 
-- [ ] T024 [P] [US2] Write unit and integration tests for RBAC in `backend/tests/integration/test_rbac.py`
+- [x] T024 [P] [US2] Write unit and integration tests for RBAC in `backend/tests/integration/test_rbac.py`
 
 ### Implementation for User Story 2
 
-- [ ] T025 [P] [US2] Create Pydantic schemas for Role, Permission, Membership in `backend/src/models/rbac_schemas.py`
-- [ ] T026 [US2] Implement DB repository for roles and permissions in `backend/src/services/rbac_repo.py`
-- [ ] T027 [US2] Implement authorization dependency checking in FastAPI in `backend/src/api/dependencies.py`
-- [ ] T028 [US2] Create POST/GET `/api/v1/roles` endpoints in `backend/src/api/routers/roles.py`
+- [x] T025 [P] [US2] Create Pydantic schemas for Role, Permission, Membership in `backend/src/models/rbac_schemas.py`
+- [x] T026 [US2] Implement DB repository for roles and permissions in `backend/src/services/rbac_repo.py`
+- [x] T027 [US2] Implement authorization dependency checking in FastAPI in `backend/src/api/dependencies.py`
+- [x] T028 [US2] Create POST/GET `/api/v1/roles` endpoints in `backend/src/api/routers/roles.py`
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work independently
 

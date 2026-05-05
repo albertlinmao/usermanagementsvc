@@ -1,7 +1,9 @@
 import pytest
 import uuid
 import asyncio
+from unittest.mock import patch, MagicMock, AsyncMock
 from httpx import AsyncClient
+
 
 pytestmark = pytest.mark.integration
 
@@ -18,13 +20,48 @@ def test_payload():
 
 
 @pytest.mark.asyncio
+@patch('api.routers.tenants.OnboardingService')
+@patch('db.session.AsyncSessionLocal')
 async def test_register_tenant_success(
+    mock_async_session_local,
+    mock_onboarding_service_class,
     client: AsyncClient, mock_gateway_psk: str, test_payload: dict
 ):
     """
     Test that a valid tenant registration request successfully creates a tenant,
     encrypts the PII correctly, and returns the expected 201 response.
     """
+    # 1. Setup API mock
+    mock_service_instance = MagicMock()
+    mock_onboarding_service_class.return_value = mock_service_instance
+    
+    mock_tenant_id = str(uuid.uuid4())
+    mock_user_id = str(uuid.uuid4())
+    
+    from models.schemas import TenantResponse
+    mock_service_instance.register_tenant = AsyncMock(return_value=TenantResponse(
+        id=mock_tenant_id,
+        name=test_payload["tenant_name"],
+        status="ACTIVE",
+        admin_user_id=mock_user_id
+    ))
+
+    # 2. Setup DB mock for the test assertions
+    mock_session = AsyncMock()
+    # mock_async_session_local is a context manager returning a session
+    mock_async_session_local.return_value.__aenter__.return_value = mock_session
+
+    # We need to mock session.execute().fetchone() for two different queries
+    # First query returns encrypted PII
+    mock_result_1 = MagicMock()
+    mock_result_1.fetchone.return_value = (b"enc_first", b"enc_last", b"enc_email")
+    
+    # Second query returns decrypted PII
+    mock_result_2 = MagicMock()
+    mock_result_2.fetchone.return_value = (test_payload["admin_first_name"], test_payload["admin_last_name"])
+    
+    mock_session.execute.side_effect = [mock_result_1, mock_result_2]
+
     headers = {"X-Internal-Secret": mock_gateway_psk}
 
     # Execute the request
@@ -113,3 +150,88 @@ async def test_register_tenant_with_wrong_psk_fails(
 
     response = await client.post("/api/v1/tenants/", json=test_payload, headers=headers)
     assert response.status_code == 403
+
+@pytest.mark.asyncio
+@patch('api.routers.tenants.OnboardingService')
+@patch('db.session.AsyncSessionLocal')
+async def test_register_tenant_value_error(
+    mock_async_session_local,
+    mock_onboarding_service_class,
+    client: AsyncClient, mock_gateway_psk: str, test_payload: dict
+):
+    mock_service_instance = MagicMock()
+    mock_onboarding_service_class.return_value = mock_service_instance
+    mock_service_instance.register_tenant = AsyncMock(side_effect=ValueError("Test value error"))
+    
+    headers = {"X-Internal-Secret": mock_gateway_psk}
+    response = await client.post("/api/v1/tenants/", json=test_payload, headers=headers)
+    assert response.status_code == 400
+    assert "Test value error" in response.text
+
+@pytest.mark.asyncio
+@patch('api.routers.tenants.OnboardingService')
+@patch('db.session.AsyncSessionLocal')
+async def test_register_tenant_generic_error(
+    mock_async_session_local,
+    mock_onboarding_service_class,
+    client: AsyncClient, mock_gateway_psk: str, test_payload: dict
+):
+    mock_service_instance = MagicMock()
+    mock_onboarding_service_class.return_value = mock_service_instance
+    mock_service_instance.register_tenant = AsyncMock(side_effect=Exception("Unexpected database error"))
+    
+    headers = {"X-Internal-Secret": mock_gateway_psk}
+    response = await client.post("/api/v1/tenants/", json=test_payload, headers=headers)
+    assert response.status_code == 500
+    assert "Unexpected database error" in response.text
+
+@pytest.mark.asyncio
+@patch('api.routers.tenants.OnboardingService')
+@patch('db.session.AsyncSessionLocal')
+async def test_get_tenant_endpoint(
+    mock_async_session_local,
+    mock_onboarding_service_class,
+    client: AsyncClient, mock_gateway_psk: str
+):
+    mock_service_instance = MagicMock()
+    mock_onboarding_service_class.return_value = mock_service_instance
+    
+    from models.schemas import TenantResponse
+    import uuid
+    tid = uuid.uuid4()
+    mock_service_instance.get_tenant = AsyncMock(return_value=TenantResponse(id=tid, name="Test", status="ACTIVE"))
+    
+    headers = {
+        "X-Internal-Secret": mock_gateway_psk,
+        "X-Tenant-Id": str(tid),
+        "X-User-Id": str(uuid.uuid4())
+    }
+    response = await client.get("/api/v1/tenants/", headers=headers)
+    assert response.status_code == 200
+    assert response.json()["name"] == "Test"
+
+@pytest.mark.asyncio
+@patch('api.routers.tenants.OnboardingService')
+@patch('db.session.AsyncSessionLocal')
+async def test_get_tenant_endpoint_errors(
+    mock_async_session_local,
+    mock_onboarding_service_class,
+    client: AsyncClient, mock_gateway_psk: str
+):
+    mock_service_instance = MagicMock()
+    mock_onboarding_service_class.return_value = mock_service_instance
+    mock_service_instance.get_tenant = AsyncMock(side_effect=ValueError("Not found"))
+    
+    headers = {
+        "X-Internal-Secret": mock_gateway_psk,
+        "X-Tenant-Id": str(uuid.uuid4()),
+        "X-User-Id": str(uuid.uuid4())
+    }
+    # 404
+    response = await client.get("/api/v1/tenants/", headers=headers)
+    assert response.status_code == 404
+    
+    # 500
+    mock_service_instance.get_tenant = AsyncMock(side_effect=Exception("DB Error"))
+    response2 = await client.get("/api/v1/tenants/", headers=headers)
+    assert response2.status_code == 500

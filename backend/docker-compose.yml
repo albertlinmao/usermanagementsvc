@@ -13,8 +13,13 @@ services:
       - .env
     environment:
       - PORT=8080
-      - SUPABASE_URL=http://host.docker.internal:8000
+      - SUPABASE_URL=http://supabase-kong:8000
+      - PYTHONPATH=src
+      - DATABASE_URL=postgresql+asyncpg://postgres:d27096746169f71e6c16998af5dc5322c14c28a2@supabase-db:5432/postgres
     command: uvicorn src.api.main:app --host 0.0.0.0 --port 8080 --reload
-    # Use host.docker.internal to allow reaching the supabase stack if it is run locally
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+    networks:
+      - supabase_default
+
+networks:
+  supabase_default:
+    external: true

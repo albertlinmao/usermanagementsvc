@@ -20,12 +20,12 @@ def mock_gateway_psk():
 
 @pytest.fixture
 def mock_tenant_id():
-    return "test-tenant-1234-abcd"
+    return "00000000-0000-0000-0000-000000000001"
 
 
 @pytest.fixture
 def mock_user_id():
-    return "test-user-5678-efgh"
+    return "00000000-0000-0000-0000-000000000002"
 
 
 @pytest.fixture

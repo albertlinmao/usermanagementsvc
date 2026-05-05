@@ -13,6 +13,164 @@
 
 ---
 <details>
+<summary><strong>🗓️ 2026-??-?? — [Status] — Short summary of the day: </strong></summary>
+
+### **Summary**
+- High-level overview of the day
+- Key outcomes / milestones reached
+
+### **Status**
+- 🟢 On Track / 🟡 At Risk / 🔴 Blocked
+
+### **Work Items**
+- [] Task 1
+
+
+OpenCode output:
+```
+
+```
+### **Key Changes**
+- Brief description of code/design changes
+- PR links (if any)
+
+### **Blockers / Risks**
+- Issue 1
+- Dependency / external blocker
+
+### **Next Steps**
+- Plan for next day
+</details>
+---
+
+<details>
+<summary><strong>🗓️ 2026-05-03  — [Status] — Short summary of the day: </strong></summary>
+
+### **Summary**
+- High-level overview of the day
+- Key outcomes / milestones reached
+
+### **Status**
+- 🟢 On Track / 🟡 At Risk / 🔴 Blocked
+
+### **Work Items**
+- [] Task 1
+
+
+OpenCode output:
+```
+
+```
+### **Key Changes**
+- Brief description of code/design changes
+- PR links (if any)
+
+### **Blockers / Risks**
+- Issue 1
+- Dependency / external blocker
+
+### **Next Steps**
+- Plan for next day
+</details>
+
+---
+<details>
+<summary><strong>🗓️ 2026-05-02 — [Status] — Short summary of the day: to get the Agent to work on Phase 4 tasks</strong></summary>
+
+### **Summary**
+- High-level overview of the day
+- Key outcomes / milestones reached
+
+### **Status**
+- 🟢 On Track / 🟡 At Risk / 🔴 Blocked
+
+### **Work Items**
+- [] Task 1
+
+/speckit.implement  implement Phase 4: User Story 2 - Granular Access Control Administration
+
+OpenCode output:
+```
+I have successfully implemented Phase 4: User Story 2 - Granular Access Control Administration per your request and the project specifications.
+Implementation Summary
+1. Test-Driven Development (TDD) Complete:
+- T024: Written and validated unit and integration tests inside backend/tests/integration/test_rbac.py simulating the creation of roles with specific permissions and retrieving roles (mocked the Supabase/PostgreSQL dependencies matching the established project pattern).
+2. Core Backend Code:
+- T025: Created the data schemas inside backend/src/models/rbac_schemas.py utilizing Pydantic to validate Role, Permission, and Membership models. 
+- T026: Implemented RBACRepository inside backend/src/services/rbac_repo.py containing parameterized queries using SQLAlchemy to perform CRUD and assignment ops on role, permission, and role_permission tables. 
+- T027: Added a RequirePermissions(resource, action) dependency check to backend/src/api/deps.py that FastAPI routes can depend on to automatically authorize users based on their assigned roles/permissions within their tenant.
+- T028: Set up the GET /api/v1/roles and POST /api/v1/roles endpoints inside backend/src/api/routers/roles.py, wiring them to a new isolated RBACService class. Wired the router to main.py.
+Validation
+All tests for User Story 1 and User Story 2 run cleanly via pytest without any failures. I have marked tasks T024 through T028 as completed ([x]) in the tasks.md manifest to keep your project tracker up to date.
+Note: No extension hooks were found or needed to execute during this operation.
+```
+
+- [x] Task 2
+
+Adding unit tests
+
+OpenCode output:
+```
+I have added dedicated unit tests to cover the Phase 4 (RBAC) implementation components to ensure robust coverage and adhere to TDD methodology. 
+What was added:
+1. tests/unit/test_rbac_repo.py (100% coverage for RBACRepository)
+   - Covers create_role and mapping row data.
+   - Covers get_roles including deduplicating SQL table joins.
+   - Covers get_or_create_permission ensuring both existence-check paths work.
+   - Covers assign_permission_to_role & get_user_permissions.
+2. tests/unit/test_rbac_service.py (100% coverage for RBACService)
+   - Mocks the AsyncSession transactions and inner repository to cleanly unit-test create_role logic.
+   - Ensures correct parameter chaining when adding roles mapped with particular resources/actions.
+   - Validates get_roles returns initialized RoleResponse pydantic models properly.
+3. tests/unit/test_deps.py (100% coverage for RequirePermissions check)
+   - Verifies the dependency successfully resolves TenantContext if the mocked user contains the matching resource/action.
+   - Validates proper raising of HTTPException(403) when the mocked user's assigned permissions don't intersect the required role logic.
+All 15 tests (unit + integration) now pass successfully, providing strong code coverage over the newly added logic.
+```
+
+- [x] Task 3
+
+Increasing unit test coverage
+
+OpenCode output:
+```
+I have gone ahead and achieved 100% test coverage across your entire src/ backend codebase! 
+What was added:
+1. src/services/tenant_repo.py: Added tests/unit/test_tenant_repo.py.
+   - Verified that create_tenant, create_user_profile, and create_membership correctly form query parameters and insert database rows under the AsyncSession.
+2. src/core/exceptions.py: Added tests/unit/test_exceptions.py.
+   - Executed the custom_exception_handler middleware against mocked requests. Verified it properly returns customized JSON payloads and assigns HTTP 422, 403, and 500 status codes for APIError, HTTPException, and generic ValueError exceptions respectively.
+3. src/core/logging.py: Added tests/unit/test_logging.py.
+   - Covered the custom JsonFormatter, ensuring it properly encodes fields like trace_id and structured exception stack traces into raw JSON.
+   - Covered the TraceIdMiddleware correctly assigning custom correlation ID headers to request.state.
+4. src/api/main.py: Added tests/unit/test_main.py.
+   - Implemented a test to verify the /health endpoint resolves successfully with a 200 HTTP OK.
+5. src/api/deps.py: Expanded tests/unit/test_deps.py.
+   - Verified header extraction properly parses identity data or rightfully errors with HTTP 400 Bad Request when edge-gateway identity headers are missing entirely.
+6. src/db/session.py: Added tests/unit/test_session.py.
+   - Checked that the get_db FastAPI database session injection dependency spins up an asynchronous generator without halting.
+7. API Routers Error States
+   - Added fault scenarios to both tests/integration/test_onboarding.py and tests/integration/test_rbac.py causing database exception errors.
+   - Tested FastAPI error handling routes to verify it resolves with the correct standardized internal HTTP 400 or HTTP 500 exceptions instead of crashing the API.
+The entire src module now evaluates to exactly 100% Total Coverage (342 covered lines / 342 total statements, with 0 misses).
+```
+
+
+### **Key Changes**
+- Brief description of code/design changes
+- PR links (if any)
+
+### **Blockers / Risks**
+- Issue 1
+- Dependency / external blocker
+
+### **Next Steps**
+- Plan for next day
+</details>
+
+
+---
+<details>
 <summary><strong>🗓️ 2026-04-27 — [Status] — Short summary of the day: create integration test for onboarding</strong></summary>
 
 ### **Summary**
@@ -60,6 +218,9 @@ Implementation Details:
 ### **Next Steps**
 - Plan for next day
 </details>
+
+---
+
 <details>
 <summary><strong>🗓️ 2026-04-19 (Day 2) — [Status] — Short summary of the day: </strong></summary>
 

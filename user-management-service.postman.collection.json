@@ -1,0 +1,49 @@
+{
+  "info": {
+    "name": "User Management API - Roles",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Create Role (POST)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "X-Internal-Secret", "value": "my_local_psk", "type": "text" },
+          { "key": "X-Tenant-Id", "value": "00000000-0000-0000-0000-000000000001", "type": "text" },
+          { "key": "X-User-Id", "value": "00000000-0000-0000-0000-000000000002", "type": "text" },
+          { "key": "Content-Type", "value": "application/json", "type": "text" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Editor\",\n  \"permissions\": [\n    {\n      \"resource\": \"articles\",\n      \"action\": \"write\"\n    },\n    {\n      \"resource\": \"articles\",\n      \"action\": \"read\"\n    }\n  ]\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/v1/roles/",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["api", "v1", "roles", ""]
+        }
+      }
+    },
+    {
+      "name": "Get Roles (GET)",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "X-Internal-Secret", "value": "my_local_psk", "type": "text" },
+          { "key": "X-Tenant-Id", "value": "00000000-0000-0000-0000-000000000001", "type": "text" },
+          { "key": "X-User-Id", "value": "00000000-0000-0000-0000-000000000002", "type": "text" }
+        ],
+        "url": {
+          "raw": "http://localhost:8080/api/v1/roles/",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["api", "v1", "roles", ""]
+        }
+      }
+    }
+  ]
+}

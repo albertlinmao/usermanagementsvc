@@ -78,3 +78,19 @@ class TenantRepository:
                 "role_id": str(role_id),
             },
         )
+
+    async def get_tenant(self, tenant_id: UUID) -> dict:
+        stmt = text("""
+            SELECT id, name, status 
+            FROM public.tenant 
+            WHERE id = :tenant_id
+        """)
+        result = await self.session.execute(stmt, {"tenant_id": str(tenant_id)})
+        row = result.fetchone()
+        if not row:
+            return None
+        return {
+            "id": row.id,
+            "name": row.name,
+            "status": row.status
+        }

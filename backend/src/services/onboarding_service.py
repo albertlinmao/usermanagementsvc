@@ -63,3 +63,15 @@ class OnboardingService:
             status="ACTIVE",
             admin_user_id=user_id,
         )
+
+    async def get_tenant(self, tenant_id: UUID) -> TenantResponse:
+        repo = TenantRepository(self.session)
+        tenant_data = await repo.get_tenant(tenant_id)
+        if not tenant_data:
+            raise ValueError(f"Tenant not found: {tenant_id}")
+            
+        return TenantResponse(
+            id=tenant_data["id"],
+            name=tenant_data["name"],
+            status=tenant_data["status"]
+        )

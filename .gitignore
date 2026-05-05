@@ -38,6 +38,8 @@ logs/
 # Supabase
 supabase/.temp/
 supabase/functions/*/node_modules/
+supabase/volumes/
+supabase/.env*
 
 # OS Files
 .DS_Store
