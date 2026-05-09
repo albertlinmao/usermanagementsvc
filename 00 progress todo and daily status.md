@@ -41,10 +41,10 @@ OpenCode output:
 ### **Next Steps**
 - Plan for next day
 </details>
----
 
+---
 <details>
-<summary><strong>🗓️ 2026-05-03  — [Status] — Short summary of the day: </strong></summary>
+<summary><strong>🗓️ 2026-05-07 — [Status] — Short summary of the day: Create integration test for user service</strong></summary>
 
 ### **Summary**
 - High-level overview of the day
@@ -59,7 +59,73 @@ OpenCode output:
 
 OpenCode output:
 ```
+Implementation Execution
+Verified Setup & Project Context
+- Ignore Files: Verified .gitignore and .dockerignore exist in the root folder and correctly contain all standard exclusions for Python/FastAPI (__pycache__, virtual environments, caches, OS files, and logs). 
+- Context Loaded: Read the feature plan and executed the TDD plan derived from tasks.md.
+Completed Tasks
+1. Created Integration Test: Implemented backend/tests/integration/test_user.py specifically focusing on the UserService.
+2. Service Testing Coverage: Developed integration test cases for all CRUD and listing behaviors:
+   - test_get_users
+   - test_get_user_found
+   - test_get_user_not_found
+   - test_create_user
+   - test_update_user
+   - test_delete_user
+3. Mocking & Best Practices: Mocked UserRepository and SQLAlchemy's AsyncSession to reliably isolate the service logic. Added datetime.now(timezone.utc) for strictly timezone-aware checks, cleanly avoiding Python 3.12+ datetime.utcnow() deprecation warnings.
+Validation
+Executed the test suite against the target implementation:
+PYTHONPATH=backend .venv/Scripts/python -m pytest backend/tests/integration/test_user.py
+Result: 6 passed, 0 warnings. All tests execute correctly against the existing models and Pydantic schemas. 
+The user services integration tests have been successfully created and validated! Let me know if you need any adjustments or further tests generated.
+```
+### **Key Changes**
+- Brief description of code/design changes
+- PR links (if any)
 
+### **Blockers / Risks**
+- Issue 1
+- Dependency / external blocker
+
+### **Next Steps**
+- Plan for next day
+</details>
+
+---
+
+<details>
+<summary><strong>🗓️ 2026-05-03  — [Status] — Short summary of the day: </strong></summary>
+
+### **Summary**
+- High-level overview of the day
+- Key outcomes / milestones reached
+
+### **Status**
+- 🟢 On Track / 🟡 At Risk / 🔴 Blocked
+
+### **Work Items**
+- [] Task 1: Phase 5: User Story 3 - User Lifecycle Management.
+- checked the completed task from tasks.md, but found the integration test for users has not been completed.
+- completed the integration test for users:
+
+OpenCode output:
+```
+I have completed Phase 5: User Story 3 - User Lifecycle Management.
+Here's a breakdown of the completed implementation:
+1. User Repository (backend/src/services/user_repo.py):
+   - Implemented UserRepository using sqlalchemy.ext.asyncio.AsyncSession.
+   - Created get_users (with pagination), get_user, create_user, and update_user methods that use pgcrypto's pgp_sym_encrypt and pgp_sym_decrypt to handle PII encryption at rest dynamically using Vault encryption keys.
+   - Added soft-deletion logic to delete_user, transitioning users to the SOFT_DELETED status rather than permanently deleting them from the user_profile table.
+2. User Service (backend/src/services/user_service.py):
+   - Implemented UserService to handle domain logic between the API router and the data repository.
+3. Users API Router (backend/src/api/routers/users.py):
+   - Added GET /api/v1/users/ (paginated), GET /api/v1/users/{id}, POST /api/v1/users/, PUT /api/v1/users/{id}, and DELETE /api/v1/users/{id} endpoints.
+   - Attached required dependencies, particularly verify_gateway_psk to ensure only the trusted Edge Gateway calls this backend API.
+   - Included the newly created users_router into the main application.
+4. Testing and Validation (backend/tests/integration/test_users.py):
+   - Verified that the pre-existing integration tests using the mocked service layer execute and pass successfully.
+   - Updated the tasks.md tracking list to correctly mark T029, T030, T031, and T032 as successfully completed [x]. 
+If you are ready, we can proceed to Phase 6: User Story 4 - Audit & Compliance Tracking (GDPR).
 ```
 ### **Key Changes**
 - Brief description of code/design changes
@@ -258,8 +324,12 @@ Both tasks have been marked as [x] in tasks.md.
 ### **Next Steps**
 - Plan for next day
 </details>
+
+---
+
 <details>
-<summary><strong>🗓️ 2026-04-18 (Day 1) — [Status] — Short summary of the day: recreate plan based on new recommendations of the project structure</strong></summary>
+<summary><strong>🗓️ 2026-04-18 (Day 1) — [Status] — Short summary of the day: recreate plan based on new recommendations of the project structure</strong>
+</summary>
 
 ### **Summary**
 - High-level overview of the day
@@ -423,6 +493,8 @@ run /speckit.implement (Execute Phase 1 (Setup) + Phase 2 (Foundational) + Phase
 ### **Next Steps**
 - Plan for next day
 
+</details>
+
 ---
 
 <details>
@@ -459,8 +531,6 @@ run /speckit.implement (Execute Phase 1 (Setup) + Phase 2 (Foundational) + Phase
 - JIRA:
 - PR:
 - Design Doc:
-
-</details>
 
 </details>
 

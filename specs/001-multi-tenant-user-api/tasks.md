@@ -101,13 +101,13 @@
 
 ### Tests for User Story 3 ⚠️
 
-- [ ] T029 [P] [US3] Write integration tests for User CRUD and pagination in `backend/tests/integration/test_users.py`
+- [x] T029 [P] [US3] Write integration tests for User CRUD and pagination in `backend/tests/integration/test_users.py`
 
 ### Implementation for User Story 3
 
-- [ ] T030 [US3] Implement DB repository for paginated user list with `pgp_sym_decrypt` in `backend/src/services/user_repo.py`
-- [ ] T031 [US3] Implement soft-delete logic for users in `backend/src/services/user_repo.py`
-- [ ] T032 [US3] Create GET/PUT/DELETE `/api/v1/users` endpoints in `backend/src/api/routers/users.py`
+- [x] T030 [US3] Implement DB repository for paginated user list with `pgp_sym_decrypt` in `backend/src/services/user_repo.py`
+- [x] T031 [US3] Implement soft-delete logic for users in `backend/src/services/user_repo.py`
+- [x] T032 [US3] Create GET/PUT/DELETE `/api/v1/users` endpoints in `backend/src/api/routers/users.py`
 
 **Checkpoint**: All user stories should now be independently functional
 

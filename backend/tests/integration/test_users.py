@@ -33,7 +33,7 @@ async def test_create_user(
     mock_user_id = str(uuid.uuid4())
 
     from models.schemas import UserProfileResponse
-    from datetime import datetime
+    from datetime import datetime, timezone
 
     mock_service_instance.create_user = AsyncMock(
         return_value=UserProfileResponse(
@@ -42,8 +42,8 @@ async def test_create_user(
             first_name=test_user_payload["first_name"],
             last_name=test_user_payload["last_name"],
             status="ACTIVE",
-            created_at=datetime.utcnow(),
-            updated_at=datetime.utcnow(),
+            created_at=datetime.now(timezone.utc),
+            updated_at=datetime.now(timezone.utc),
         )
     )
 
@@ -64,7 +64,7 @@ async def test_get_users(mock_user_service_class, authenticated_client: AsyncCli
     mock_user_service_class.return_value = mock_service_instance
 
     from models.schemas import UserProfileResponse
-    from datetime import datetime
+    from datetime import datetime, timezone
 
     mock_service_instance.get_users = AsyncMock(
         return_value={
@@ -75,8 +75,8 @@ async def test_get_users(mock_user_service_class, authenticated_client: AsyncCli
                     first_name="First",
                     last_name="Last",
                     status="ACTIVE",
-                    created_at=datetime.utcnow(),
-                    updated_at=datetime.utcnow(),
+                    created_at=datetime.now(timezone.utc),
+                    updated_at=datetime.now(timezone.utc),
                 )
             ],
             "next_cursor": None,
@@ -102,7 +102,7 @@ async def test_get_user(mock_user_service_class, authenticated_client: AsyncClie
 
     mock_user_id = str(uuid.uuid4())
     from models.schemas import UserProfileResponse
-    from datetime import datetime
+    from datetime import datetime, timezone
 
     mock_service_instance.get_user = AsyncMock(
         return_value=UserProfileResponse(
@@ -111,8 +111,8 @@ async def test_get_user(mock_user_service_class, authenticated_client: AsyncClie
             first_name="First",
             last_name="Last",
             status="ACTIVE",
-            created_at=datetime.utcnow(),
-            updated_at=datetime.utcnow(),
+            created_at=datetime.now(timezone.utc),
+            updated_at=datetime.now(timezone.utc),
         )
     )
 
@@ -136,7 +136,7 @@ async def test_update_user(
 
     mock_user_id = str(uuid.uuid4())
     from models.schemas import UserProfileResponse
-    from datetime import datetime
+    from datetime import datetime, timezone
 
     mock_service_instance.update_user = AsyncMock(
         return_value=UserProfileResponse(
@@ -145,8 +145,8 @@ async def test_update_user(
             first_name=test_user_update_payload["first_name"],
             last_name=test_user_update_payload["last_name"],
             status=test_user_update_payload["status"].upper(),
-            created_at=datetime.utcnow(),
-            updated_at=datetime.utcnow(),
+            created_at=datetime.now(timezone.utc),
+            updated_at=datetime.now(timezone.utc),
         )
     )
 
@@ -171,3 +171,51 @@ async def test_delete_user(mock_user_service_class, authenticated_client: AsyncC
 
     response = await authenticated_client.delete(f"/api/v1/users/{mock_user_id}")
     assert response.status_code == 204
+
+
+@pytest.mark.asyncio
+@patch("api.routers.users.UserService")
+async def test_get_user_not_found(
+    mock_user_service_class, authenticated_client: AsyncClient
+):
+    mock_service_instance = MagicMock()
+    mock_user_service_class.return_value = mock_service_instance
+
+    mock_service_instance.get_user = AsyncMock(return_value=None)
+
+    response = await authenticated_client.get(f"/api/v1/users/{uuid.uuid4()}")
+    assert response.status_code == 404
+    assert response.json()["error"]["message"] == "User not found"
+
+
+@pytest.mark.asyncio
+@patch("api.routers.users.UserService")
+async def test_update_user_not_found(
+    mock_user_service_class, authenticated_client: AsyncClient
+):
+    mock_service_instance = MagicMock()
+    mock_user_service_class.return_value = mock_service_instance
+
+    mock_service_instance.update_user = AsyncMock(return_value=None)
+
+    response = await authenticated_client.put(
+        f"/api/v1/users/{uuid.uuid4()}",
+        json={"first_name": "Ghost", "last_name": "User", "status": "active"},
+    )
+    assert response.status_code == 404
+    assert response.json()["error"]["message"] == "User not found"
+
+
+@pytest.mark.asyncio
+@patch("api.routers.users.UserService")
+async def test_delete_user_not_found(
+    mock_user_service_class, authenticated_client: AsyncClient
+):
+    mock_service_instance = MagicMock()
+    mock_user_service_class.return_value = mock_service_instance
+
+    mock_service_instance.delete_user = AsyncMock(return_value=False)
+
+    response = await authenticated_client.delete(f"/api/v1/users/{uuid.uuid4()}")
+    assert response.status_code == 404
+    assert response.json()["error"]["message"] == "User not found"

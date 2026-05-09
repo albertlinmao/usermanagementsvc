@@ -1,6 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from api.routers.tenants import router as tenants_router
 from api.routers.roles import router as roles_router
+from api.routers.users import router as users_router
 from core.logging import TraceIdMiddleware
 from core.idempotency import IdempotencyMiddleware
 from core.exceptions import custom_exception_handler, APIError
@@ -19,6 +20,7 @@ app.add_exception_handler(HTTPException, custom_exception_handler)
 # Routers
 app.include_router(tenants_router, prefix="/api/v1/tenants", tags=["Tenants"])
 app.include_router(roles_router, prefix="/api/v1/roles", tags=["Roles"])
+app.include_router(users_router, prefix="/api/v1")
 
 
 @app.get("/health")
