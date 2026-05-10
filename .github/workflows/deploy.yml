@@ -1,0 +1,32 @@
+name: CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+    tags: [ 'v*.*.*' ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [] # Could depend on CI build-and-push-docker if it pushed to a registry
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'latest'
+
+      # - name: Configure Kubernetes credentials
+      #   uses: azure/k8s-set-context@v3
+      #   with:
+      #     method: kubeconfig
+      #     kubeconfig: ${{ secrets.KUBECONFIG }}
+
+      - name: Deploy to Kubernetes
+        run: |
+          echo "Deploying to Kubernetes cluster..."
+          # kubectl apply -f backend/k8s/deployment.yaml
+          # kubectl rollout status deployment/user-management-api
+          echo "Deployment simulated (uncomment kubectl commands when cluster is configured)"

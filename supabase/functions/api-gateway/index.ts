@@ -12,6 +12,28 @@ const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || "
 const tenantSuspensionCache = new Map<string, { suspended: boolean, timestamp: number }>();
 const CACHE_TTL_MS = 60000; // 1 minute
 
+// Simple Rate Limiting (Fixed Window per IP/Tenant)
+const rateLimits = new Map<string, { count: number, resetAt: number }>();
+const RATE_LIMIT_WINDOW_MS = 60000; // 1 minute
+const MAX_REQUESTS_PER_WINDOW = 100;
+
+function checkRateLimit(key: string): boolean {
+  const now = Date.now();
+  const record = rateLimits.get(key);
+
+  if (!record || now > record.resetAt) {
+    rateLimits.set(key, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
+    return true;
+  }
+
+  if (record.count >= MAX_REQUESTS_PER_WINDOW) {
+    return false;
+  }
+
+  record.count += 1;
+  return true;
+}
+
 async function isTenantSuspended(tenantId: string): Promise<boolean> {
   const cached = tenantSuspensionCache.get(tenantId);
   if (cached && (Date.now() - cached.timestamp < CACHE_TTL_MS)) {
@@ -38,10 +60,18 @@ async function isTenantSuspended(tenantId: string): Promise<boolean> {
   return false;
 }
 
-serve(async (req) => {
+serve(async (req, connInfo) => {
   // CORS handling
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type' } })
+  }
+
+  // Rate Limiting by IP
+  // Note: connInfo is available in std/http serve, but if not we fallback to header or default
+  // In Supabase Edge Functions, client IP can often be found in x-forwarded-for
+  const clientIp = req.headers.get('x-forwarded-for')?.split(',')[0] || 'unknown-ip';
+  if (!checkRateLimit(clientIp)) {
+    return new Response(JSON.stringify({ error: 'Too many requests' }), { status: 429, headers: { 'Content-Type': 'application/json' } });
   }
 
   const url = new URL(req.url);

@@ -12,6 +12,7 @@ from models.schemas import (
 from services.user_service import UserService
 from services.gdpr_service import GdprService
 from core.security import verify_gateway_psk
+from core.feature_flags import feature_flags
 
 router = APIRouter(
     prefix="/users", tags=["users"], dependencies=[Depends(verify_gateway_psk)]
@@ -101,6 +102,12 @@ async def hard_delete_user(
     Hard delete a user profile (GDPR purging).
     Replaces PII with stubs and maintains the UUID.
     """
+    if not feature_flags.is_enabled("gdpr-hard-delete"):
+        raise HTTPException(
+            status_code=status.HTTP_501_NOT_IMPLEMENTED,
+            detail="GDPR hard deletion feature is not currently enabled.",
+        )
+
     success = await service.hard_delete_user(user_id)
     if not success:
         raise HTTPException(

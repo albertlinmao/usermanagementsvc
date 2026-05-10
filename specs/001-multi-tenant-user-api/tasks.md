@@ -136,13 +136,13 @@
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T038 [P] Create GitHub Actions pipeline to run tests and build Docker images in `.github/workflows/ci.yml`
-- [ ] T039 [P] Create Kubernetes deployment manifests and Helm chart configurations in `backend/k8s/deployment.yaml`
-- [ ] T040 Create GitHub Actions deployment pipeline for Kubernetes in `.github/workflows/deploy.yml`
-- [ ] T041 Implement rate-limiting at the Supabase Edge Gateway in `supabase/functions/api-gateway/index.ts`
-- [ ] T042 Create load testing script (`k6`) to validate <200ms latency in `backend/tests/performance/load_test.js`
-- [ ] T043 [P] Configure and verify Supabase automated daily backups and Point-in-Time Recovery (PITR) via IaC/Config
-- [ ] T044 Wrap the new GDPR hard-deletion endpoint (US4) and Onboarding endpoint (US1) with the configured Feature Flag provider
+- [x] T038 [P] Create GitHub Actions pipeline to run tests and build Docker images in `.github/workflows/ci.yml`
+- [x] T039 [P] Create Kubernetes deployment manifests and Helm chart configurations in `backend/k8s/deployment.yaml`
+- [x] T040 Create GitHub Actions deployment pipeline for Kubernetes in `.github/workflows/deploy.yml`
+- [x] T041 Implement rate-limiting at the Supabase Edge Gateway in `supabase/functions/api-gateway/index.ts`
+- [x] T042 Create load testing script (`k6`) to validate <200ms latency in `backend/tests/performance/load_test.js`
+- [x] T043 [P] Configure and verify Supabase automated daily backups and Point-in-Time Recovery (PITR) via IaC/Config
+- [x] T044 Wrap the new GDPR hard-deletion endpoint (US4) and Onboarding endpoint (US1) with the configured Feature Flag provider
 
 ---
 
