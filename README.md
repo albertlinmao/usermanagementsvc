@@ -131,3 +131,134 @@ curl -X GET http://localhost:8080/api/v1/roles/ \
      -H "X-Tenant-Id: <tenant_id>" \
      -H "X-User-Id: <user_id>"
 ```
+
+### 5. Create User (POST)
+To test the User Lifecycle Management feature (User Story 3), create a new user profile inside your tenant.
+
+```bash
+curl -X POST http://localhost:8080/api/v1/users/ \
+     -H "Content-Type: application/json" \
+     -H "X-Internal-Secret: my_local_psk" \
+     -H "X-Tenant-Id: <tenant_id>" \
+     -H "X-User-Id: <admin_user_id>" \
+     -d '{
+       "email": "user.smoke@example.com",
+       "first_name": "Smoke",
+       "last_name": "User",
+       "middle_name": "Test",
+       "role_ids": []
+     }'
+```
+*(This will return the new user's `<user_id>` needed for subsequent steps).*
+
+### 6. Get Users (GET)
+Fetch a paginated list of all users within your tenant.
+
+```bash
+curl -X GET "http://localhost:8080/api/v1/users/?limit=10" \
+     -H "X-Internal-Secret: my_local_psk" \
+     -H "X-Tenant-Id: <tenant_id>" \
+     -H "X-User-Id: <admin_user_id>"
+```
+
+### 7. Get User Details (GET)
+Fetch details for a specific user using their `<user_id>`.
+
+```bash
+curl -X GET "http://localhost:8080/api/v1/users/<user_id>" \
+     -H "X-Internal-Secret: my_local_psk" \
+     -H "X-Tenant-Id: <tenant_id>" \
+     -H "X-User-Id: <admin_user_id>"
+```
+
+### 8. Update User (PUT)
+Update a user's details, for example, changing their status to "active".
+
+```bash
+curl -X PUT "http://localhost:8080/api/v1/users/<user_id>" \
+     -H "Content-Type: application/json" \
+     -H "X-Internal-Secret: my_local_psk" \
+     -H "X-Tenant-Id: <tenant_id>" \
+     -H "X-User-Id: <admin_user_id>" \
+     -d '{
+       "first_name": "Updated Smoke",
+       "last_name": "User",
+       "status": "active"
+     }'
+```
+
+### 9. Soft Delete User (DELETE)
+Soft delete a user by changing their status without wiping their underlying records.
+
+```bash
+curl -X DELETE "http://localhost:8080/api/v1/users/<user_id>" \
+     -H "X-Internal-Secret: my_local_psk" \
+     -H "X-Tenant-Id: <tenant_id>" \
+     -H "X-User-Id: <admin_user_id>"
+```
+
+### 10. Get Audit Logs (GET)
+To verify Audit Tracking (User Story 4) captures state-mutating events. This returns immutable, paginated logs of system actions.
+
+```bash
+curl -X GET "http://localhost:8080/api/v1/audit/?limit=50" \
+     -H "X-Internal-Secret: my_local_psk" \
+     -H "X-Tenant-Id: <tenant_id>" \
+     -H "X-User-Id: <admin_user_id>"
+```
+
+### 11. Auth Webhook Event (POST)
+Test the webhook endpoint used to securely log Supabase Auth events.
+
+```bash
+curl -X POST "http://localhost:8080/api/v1/webhooks/auth" \
+     -H "Content-Type: application/json" \
+     -H "X-Internal-Secret: my_local_psk" \
+     -H "X-Tenant-Id: <tenant_id>" \
+     -H "X-User-Id: <admin_user_id>" \
+     -d '{
+       "type": "INSERT",
+       "table": "users",
+       "record": {
+         "id": "<user_id>",
+         "email": "webhook.test@example.com"
+       },
+       "schema": "auth",
+       "old_record": null
+     }'
+```
+
+### 12. GDPR Hard Delete (DELETE)
+Trigger a GDPR compliance erasure on a user's profile. This replaces their PII with `[REDACTED_PII]` stubs inside the DB while preserving structural UUID integrity for the audit logs.
+
+```bash
+curl -X DELETE "http://localhost:8080/api/v1/users/<user_id>/hard" \
+     -H "X-Internal-Secret: my_local_psk" \
+     -H "X-Tenant-Id: <tenant_id>" \
+     -H "X-User-Id: <admin_user_id>"
+```
+
+## Debug with me
+If you're using an AI Assistant (like AntiGravity) and run into issues while testing the Create User API (or any other API), you can simply ask the assistant to debug it with you!
+
+Here are some ways the AI can help debug:
+
+### 1. Reproduce the Request and Analyze the Response
+If you are getting a 4xx or 5xx error, the AI can run a `curl` command directly from its environment against your local server to see the exact error response and traceback. Just tell it the payload you are sending or the error you are receiving.
+
+### 2. Inspect the Backend Logs
+If the API is failing silently or returning a 500 error, the AI can inspect your local backend logs to find the exact stack trace by running `docker compose` log commands or by temporarily injecting `print()` statements or structured logging into `backend/src/services/user_service.py` to trace the data flow (e.g., verifying if the Supabase Auth call is failing or if the database `INSERT` is throwing a unique constraint violation).
+
+ $ docker compose -f backend/docker-compose.yml logs --tail 50 backend
+
+### 3. Check Database & Supabase State
+Since the `create_user` API coordinates between **Supabase Auth** (identity) and **PostgreSQL** (`user_profile` table), desyncs often happen here (e.g., a user exists in Auth but not in the DB). 
+The AI can use its tools to execute SQL queries directly against your local Postgres database to check the state of the tables.
+
+### 4. Run the Integration Tests
+The project already has an integration test suite. The AI can run specific test cases in isolation, for example:
+```bash
+cd backend && python -m pytest tests/integration/test_users.py::test_create_user -v
+```
+
+Just say "Help me debug the create user API" or paste your error message, and the assistant can immediately run the tools to investigate!

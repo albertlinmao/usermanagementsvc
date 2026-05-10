@@ -5,45 +5,438 @@
   },
   "item": [
     {
-      "name": "Create Role (POST)",
-      "request": {
-        "method": "POST",
-        "header": [
-          { "key": "X-Internal-Secret", "value": "my_local_psk", "type": "text" },
-          { "key": "X-Tenant-Id", "value": "00000000-0000-0000-0000-000000000001", "type": "text" },
-          { "key": "X-User-Id", "value": "00000000-0000-0000-0000-000000000002", "type": "text" },
-          { "key": "Content-Type", "value": "application/json", "type": "text" }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"name\": \"Editor\",\n  \"permissions\": [\n    {\n      \"resource\": \"articles\",\n      \"action\": \"write\"\n    },\n    {\n      \"resource\": \"articles\",\n      \"action\": \"read\"\n    }\n  ]\n}"
+      "name": "Roles (Phase 4)",
+      "item": [
+        {
+          "name": "Create Role (POST)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Internal-Secret",
+                "value": "my_local_psk",
+                "type": "text"
+              },
+              {
+                "key": "X-Tenant-Id",
+                "value": "00000000-0000-0000-0000-000000000001",
+                "type": "text"
+              },
+              {
+                "key": "X-User-Id",
+                "value": "00000000-0000-0000-0000-000000000002",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Editor\",\n  \"permissions\": [\n    {\n      \"resource\": \"articles\",\n      \"action\": \"write\"\n    },\n    {\n      \"resource\": \"articles\",\n      \"action\": \"read\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/roles/",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "roles",
+                ""
+              ]
+            }
+          }
         },
-        "url": {
-          "raw": "http://localhost:8080/api/v1/roles/",
-          "protocol": "http",
-          "host": ["localhost"],
-          "port": "8080",
-          "path": ["api", "v1", "roles", ""]
+        {
+          "name": "Get Roles (GET)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Internal-Secret",
+                "value": "my_local_psk",
+                "type": "text"
+              },
+              {
+                "key": "X-Tenant-Id",
+                "value": "00000000-0000-0000-0000-000000000001",
+                "type": "text"
+              },
+              {
+                "key": "X-User-Id",
+                "value": "00000000-0000-0000-0000-000000000002",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/roles/",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "roles",
+                ""
+              ]
+            }
+          }
         }
-      }
+      ]
     },
     {
-      "name": "Get Roles (GET)",
-      "request": {
-        "method": "GET",
-        "header": [
-          { "key": "X-Internal-Secret", "value": "my_local_psk", "type": "text" },
-          { "key": "X-Tenant-Id", "value": "00000000-0000-0000-0000-000000000001", "type": "text" },
-          { "key": "X-User-Id", "value": "00000000-0000-0000-0000-000000000002", "type": "text" }
-        ],
-        "url": {
-          "raw": "http://localhost:8080/api/v1/roles/",
-          "protocol": "http",
-          "host": ["localhost"],
-          "port": "8080",
-          "path": ["api", "v1", "roles", ""]
+      "name": "Users (Phase 5)",
+      "item": [
+        {
+          "name": "Create User (POST)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Internal-Secret",
+                "value": "my_local_psk",
+                "type": "text"
+              },
+              {
+                "key": "X-Tenant-Id",
+                "value": "00000000-0000-0000-0000-000000000001",
+                "type": "text"
+              },
+              {
+                "key": "X-User-Id",
+                "value": "00000000-0000-0000-0000-000000000002",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"john.doe@example.com\",\n  \"first_name\": \"John\",\n  \"last_name\": \"Doe\",\n  \"middle_name\": \"A\",\n  \"role_ids\": []\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/users/",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "users",
+                ""
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Users (GET)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Internal-Secret",
+                "value": "my_local_psk",
+                "type": "text"
+              },
+              {
+                "key": "X-Tenant-Id",
+                "value": "00000000-0000-0000-0000-000000000001",
+                "type": "text"
+              },
+              {
+                "key": "X-User-Id",
+                "value": "00000000-0000-0000-0000-000000000002",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/users/?limit=10",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "users",
+                ""
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get User (GET)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Internal-Secret",
+                "value": "my_local_psk",
+                "type": "text"
+              },
+              {
+                "key": "X-Tenant-Id",
+                "value": "00000000-0000-0000-0000-000000000001",
+                "type": "text"
+              },
+              {
+                "key": "X-User-Id",
+                "value": "00000000-0000-0000-0000-000000000002",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/users/{{user_id}}",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "users",
+                "{{user_id}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update User (PUT)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "X-Internal-Secret",
+                "value": "my_local_psk",
+                "type": "text"
+              },
+              {
+                "key": "X-Tenant-Id",
+                "value": "00000000-0000-0000-0000-000000000001",
+                "type": "text"
+              },
+              {
+                "key": "X-User-Id",
+                "value": "00000000-0000-0000-0000-000000000002",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"first_name\": \"Johnny\",\n  \"last_name\": \"Doe\",\n  \"status\": \"active\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/users/{{user_id}}",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "users",
+                "{{user_id}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Soft Delete User (DELETE)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "X-Internal-Secret",
+                "value": "my_local_psk",
+                "type": "text"
+              },
+              {
+                "key": "X-Tenant-Id",
+                "value": "00000000-0000-0000-0000-000000000001",
+                "type": "text"
+              },
+              {
+                "key": "X-User-Id",
+                "value": "00000000-0000-0000-0000-000000000002",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/users/{{user_id}}",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "users",
+                "{{user_id}}"
+              ]
+            }
+          }
         }
-      }
+      ]
+    },
+    {
+      "name": "Audit & Compliance (Phase 6)",
+      "item": [
+        {
+          "name": "Get Audit Logs (GET)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Internal-Secret",
+                "value": "my_local_psk",
+                "type": "text"
+              },
+              {
+                "key": "X-Tenant-Id",
+                "value": "00000000-0000-0000-0000-000000000001",
+                "type": "text"
+              },
+              {
+                "key": "X-User-Id",
+                "value": "00000000-0000-0000-0000-000000000002",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/audit/?limit=50",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "audit",
+                ""
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "50"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Hard Delete User - GDPR (DELETE)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "X-Internal-Secret",
+                "value": "my_local_psk",
+                "type": "text"
+              },
+              {
+                "key": "X-Tenant-Id",
+                "value": "00000000-0000-0000-0000-000000000001",
+                "type": "text"
+              },
+              {
+                "key": "X-User-Id",
+                "value": "00000000-0000-0000-0000-000000000002",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/users/{{user_id}}/hard",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "users",
+                "{{user_id}}",
+                "hard"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Auth Webhook Event (POST)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Internal-Secret",
+                "value": "my_local_psk",
+                "type": "text"
+              },
+              {
+                "key": "X-Tenant-Id",
+                "value": "00000000-0000-0000-0000-000000000001",
+                "type": "text"
+              },
+              {
+                "key": "X-User-Id",
+                "value": "00000000-0000-0000-0000-000000000002",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"INSERT\",\n  \"table\": \"users\",\n  \"record\": {\n    \"id\": \"123e4567-e89b-12d3-a456-426614174000\",\n    \"email\": \"webhook.test@example.com\"\n  },\n  \"schema\": \"auth\",\n  \"old_record\": null\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/webhooks/auth",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "webhooks",
+                "auth"
+              ]
+            }
+          }
+        }
+      ]
     }
   ]
 }

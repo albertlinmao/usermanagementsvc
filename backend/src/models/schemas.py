@@ -48,3 +48,20 @@ class PaginatedUserResponse(BaseModel):
     data: list[UserProfileResponse]
     next_cursor: Optional[str] = None
     has_more: bool
+
+
+class AuditLogResponse(BaseModel):
+    id: UUID
+    table_name: str
+    record_id: UUID
+    action: str
+    old_data: Optional[dict] = None
+    new_data: Optional[dict] = None
+    changed_by: Optional[UUID] = None
+    changed_at: datetime
+
+
+class PaginatedAuditLogResponse(BaseModel):
+    data: list[AuditLogResponse]
+    next_cursor: Optional[str] = None
+    has_more: bool

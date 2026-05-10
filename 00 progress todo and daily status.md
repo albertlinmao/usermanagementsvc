@@ -43,6 +43,200 @@ OpenCode output:
 </details>
 
 ---
+---
+<details>
+<summary><strong>🗓️ 2026-05-09 — [Status] — Short summary of the day: Phase 6: User Story 4 - Audit & Compliance Tracking</strong></summary>
+
+### **Summary**
+- High-level overview of the day
+- Key outcomes / milestones reached
+
+### **Status**
+- 🟢 On Track / 🟡 At Risk / 🔴 Blocked
+After increase all test coverage to 100%, the project is now ready for Phase 6: User Story 4 - Audit & Compliance Tracking.
+
+### **Work Items**
+What is soft delete?
+
+```
+In this system, a Soft Delete is a standard way of offboarding or removing a user from the active application without actually erasing their underlying data.
+
+When you trigger the DELETE /api/v1/users/{user_id} endpoint, the system performs a soft delete in backend/src/services/user_repo.py by doing two things:
+
+It changes the user's status column from ACTIVE to SOFT_DELETED.
+
+It sets the deleted_at timestamp to the current date and time.
+
+How it differs from a GDPR Hard Delete
+Data Retention: Unlike a GDPR hard delete, a soft delete keeps the user's PII (email, first name, last name) fully intact and encrypted in the database.
+
+Reversibility: A soft delete is reversible. A system administrator could theoretically restore the user by changing their status back to ACTIVE and clearing the deleted_at timestamp. A GDPR hard delete is completely irreversible.
+
+Visibility: Soft-deleted users are typically filtered out of standard UI views and API responses (like the "Get Users" list), but their full profile remains available to database administrators for historical or operational purposes.
+
+Why use Soft Delete?
+Soft deletion is the standard practice for typical business operations (e.g., an employee leaves the company or a user cancels their subscription). It immediately revokes the user's access to the system while safely preserving their data in case it's needed for billing disputes, internal HR records, or accidental deletion recovery.
+```
+
+
+What is GDPR hard delete?
+
+```
+In the context of this Multi-Tenant system, a GDPR Hard Delete addresses the European Union's GDPR "Right to be Forgotten," which legally requires that a user's Personally Identifiable Information (PII) be permanently erased upon request.
+
+However, in enterprise architectures, simply dropping a user row from a database creates a massive problem: Audit Logging. If you delete a user's row entirely, it breaks the UUID references in your immutable audit logs, making it impossible to see the history of what that anonymous user did in the system before they left.
+
+To solve this, the GDPR Hard Delete we implemented in backend/src/services/gdpr_service.py does the following:
+
+Purges Identity (Supabase Auth): It uses the Supabase Admin API to completely overwrite the user's actual login credentials. It replaces their email with a scrambled, unroutable stub (e.g., deleted-<uuid>@redacted.local) and randomizes their password so they can never log back in.
+
+Scrubs PII (PostgreSQL): It updates their record in the public.user_profile table, permanently overwriting their encrypted email, first_name, and last_name with a literal string: [REDACTED_PII].
+
+Mains Structural Integrity: The row itself, and most importantly its internal id (the UUID), is kept intact.
+
+By scrubbing the data instead of dropping the row, the system is completely purged of the user's personal data (satisfying the GDPR legal requirement), but the database constraints and the audit_log history remain structurally sound. Security officers can still see that UUID X modified a file three months ago, even though UUID X's real-world identity has been permanently erased.
+```
+
+
+Troubleshoot POST:users api
+
+```
+$ curl -s -X POST http://localhost:8080/api/v1/users/ \
+     -H "Content-Type: application/json" \
+     -H "X-Internal-Secret: my_local_psk" \
+     -H "X-Tenant-Id: <tenant_id>" \
+     -H "X-User-Id: <admin_user_id>" \
+     -d '{
+       "email": "user.smoke@example.com",
+       "first_name": "Smoke",
+       "last_name": "User",
+       "middle_name": "Test",
+       "role_ids": []
+     }'
+{"error":{"code":"INTERNAL_SERVER_ERROR","message":"An unexpected error occurred.","details":{},"trace_id":"unknown"}}
+
+I have successfully investigated and resolved the 500 INTERNAL_SERVER_ERROR you encountered on the Create User API!
+Root Cause
+I pulled up the backend logs via Docker and noticed this error being thrown:
+sqlalchemy.exc.IntegrityError: <class 'asyncpg.exceptions.ForeignKeyViolationError'>: insert or update on table "user_profile" violates foreign key constraint "user_profile_id_fkey"
+DETAIL:  Key (id)=(...) is not present in table "users".
+The issue was occurring in backend/src/services/user_service.py. The original implementation had a placeholder comment saying: In a real system, we'd also register the user in Supabase Auth via Admin API. Here we just create the profile and simulate UUID generation. 
+Because it was just generating a random UUID in Python and inserting it into public.user_profile, PostgreSQL forcefully rejected it because user_profile.id has a strict Foreign Key relationship mapping to the Supabase auth.users table.
+The Fix
+I directly modified user_service.py to leverage the Supabase Admin API. Now, when a request hits the Create User endpoint:
+1. It creates the user identity in Supabase Auth via self.supabase.auth.admin.create_user().
+2. It extracts the generated UUID from the newly created Supabase Auth record.
+3. It uses that valid Auth UUID to successfully insert the encrypted records into public.user_profile without throwing constraint violations.
+Verification
+Since your Docker backend utilizes live-reloading (--reload with mounted volumes), the changes took effect immediately. I ran your exact cURL request again, and it successfully returned a 201 Created!
+Expected output:
+{
+  "id": "f718c9c5-9be3-466f-8998-96f77a8f12c5",
+  "email": "user.smoke@example.com",
+  "first_name": "Smoke",
+  "last_name": "User",
+  "status": "ACTIVE",
+  "created_at": "2026-05-09T22:23:49.072474Z",
+  "updated_at": "2026-05-09T22:23:49.072474Z"
+}
+You can now proceed to run this request from your terminal or utilizing the Postman collection we just updated! Let me know if you want to test anything else.
+```
+
+
+implement the following tasks to complete Phase 6:
+- [ ] T033 [P] [US4] Write tests for audit log retrieval and GDPR hard deletion in `backend/tests/integration/test_audit.py`
+OpenCode output:
+```
+I have successfully completed the task T033 [P] [US4] Write tests for audit log retrieval and GDPR hard deletion in backend/tests/integration/test_audit.py.
+Here is a summary of the actions taken:
+1. Checked for pre-execution hooks in .specify/extensions.yml (none found).
+2. Checked checklist status: all 15 items in checklists/requirements.md are complete.
+3. Verified the implementation context, ensuring we are following the TDD constitutional mandate of writing the tests before the actual implementation (T034-T037).
+4. Read the data model and the existing testing structure in test_users.py to match testing conventions.
+5. Created the file backend/tests/integration/test_audit.py with integration tests for:
+   - Audit log retrieval endpoint GET /api/v1/audit/
+   - GDPR hard deletion endpoints DELETE /api/v1/users/{id}/hard
+6. Mocked the AuditService and GdprService to follow existing mocking conventions seen in the codebase.
+7. Verified that the test framework identifies these newly added tests, though they (like others in the repository currently) fail against pytest_asyncio plugin on Python 3.13—which validates that the file integrates exactly identically to other tests. As per TDD, these are also expected to fail for API functionality reasons because their endpoints haven't been implemented yet.
+8. Marked T033 as complete ([x]) in tasks.md.
+9. Checked for post-execution hooks (none found).
+```
+
+Implementation for User Story 4
+
+- [ ] T034 [US4] Implement Supabase Auth Webhook handler endpoint to capture authentication events in `backend/src/api/routers/webhooks.py`
+- [ ] T035 [US4] Implement audit log retrieval repository and endpoint in `backend/src/api/routers/audit.py`
+- [ ] T036 [US4] Implement GDPR hard-delete logic (scrubbing PII) in `backend/src/services/gdpr_service.py`
+- [ ] T037 [US4] Create DELETE `/api/v1/users/{id}/hard` endpoint for GDPR purging in `backend/src/api/routers/users.py`
+
+OpenCode output:
+```
+I have successfully completed the tasks for Phase 6 (Implementation for User Story 4). Here is a summary of the work done:
+1. T034 (Webhooks Handler): Created backend/src/api/routers/webhooks.py with a POST /api/v1/webhooks/auth endpoint. It parses incoming authentication events (like logins) from Supabase Auth and manually logs them to the public.audit_log table maintaining the immutability requirements and extracting the user_id.
+2. T035 (Audit Log Retrieval): Created backend/src/api/routers/audit.py with the AuditService and a GET /api/v1/audit/ endpoint. 
+    - Added AuditLogResponse and PaginatedAuditLogResponse Pydantic schemas in backend/src/models/schemas.py. 
+    - The endpoint implements cursor-based pagination (via changed_at) correctly fetching historical records.
+3. T036 (GDPR Hard Delete Service): Implemented GdprService inside backend/src/services/gdpr_service.py. 
+    - Instead of physically deleting rows (which would CASCADE delete to audit_log causing issues or set changed_by to NULL), it generates an anonymized email stub.
+    - It updates auth.users via the Supabase Admin API to completely replace their credentials and scramble their account. 
+    - It manually encrypts "[REDACTED_PII]" stubs via pgp_sym_encrypt and a Vault encryption key and directly overwrites the encrypted blobs inside public.user_profile. This properly fulfills FR-008 by purging PII while maintaining the UUID for the audit_log structural integrity.
+4. T037 (GDPR Endpoints): Modified backend/src/api/routers/users.py to inject GdprService and expose the DELETE /api/v1/users/{user_id}/hard API route.
+5. Router Registration: Wired up audit_router and webhooks_router to app inside backend/src/api/main.py and exported them inside backend/src/api/routers/__init__.py. 
+6. Task Tracking: Checked off tasks T034, T035, T036, and T037 in the tasks.md spec document. I also resolved a small LSP python typing issue inside audit.py.
+The Python test framework successfully collected the test_audit.py tests with these module imports confirming there are no structural errors.
+```
+
+Create Requests in Postman collection to cover phase 5/6
+
+```
+I have successfully updated the Postman collection user-management-service.postman.collection.json with the required requests for both Phase 5 and Phase 6.
+I organized the requests into two distinct folders for clarity:
+1. Users (Phase 5)
+- Create User (POST): POST /api/v1/users/ (With a JSON body containing email, first_name, last_name, etc.)
+- Get Users (GET): GET /api/v1/users/?limit=10 (Tests pagination limits)
+- Get User (GET): GET /api/v1/users/{{user_id}} (Uses a Postman variable {{user_id}} to fetch a specific user)
+- Update User (PUT): PUT /api/v1/users/{{user_id}} (Tests the update user endpoint)
+- Soft Delete User (DELETE): DELETE /api/v1/users/{{user_id}}
+2. Audit & Compliance (Phase 6)
+- Get Audit Logs (GET): GET /api/v1/audit/?limit=50 (Tests the paginated log endpoint fetching immutable logs)
+- Hard Delete User - GDPR (DELETE): DELETE /api/v1/users/{{user_id}}/hard (Triggers the backend GdprService to replace PII with [REDACTED_PII] and update Supabase Auth while keeping the UUID intact)
+- Auth Webhook Event (POST): POST /api/v1/webhooks/auth (Provides a sample JSON body simulating a Supabase Webhook payload with type, record, etc. to securely mock internal logging functionality)
+Note: All endpoints come pre-configured with the required security headers (e.g., X-Internal-Secret: my_local_psk, X-Tenant-Id, X-User-Id), matching the FastAPI backend verify_gateway_psk dependencies ensuring these requests can successfully bypass the Edge gateway rules locally.
+```
+
+Asked to update README.md API Smoke Testing to add steps to cover the APIs created in Phase 5 and Phase 6
+
+```
+I have successfully updated the README.md file under the section "API Smoke Testing" to include detailed cURL examples for testing Phase 5 (User Management) and Phase 6 (Audit & Compliance) endpoints.
+New Sections Added:
+Phase 5: Create User (POST)
+
+This section includes a cURL command to create a new tenant and admin user via the onboarding endpoint.
+Phase 5: Get Current Tenant (GET)
+
+This section provides instructions and a cURL command to verify the tenant was created.
+Phase 5: Create Custom Role (POST)
+
+This section includes a cURL command to create a custom role and map permissions to it.
+Phase 5: Get Roles (GET)
+
+This section provides a cURL command to retrieve custom roles.
+I have also ensured all commands use the localhost:8080 host and include the necessary security headers (X-Internal-Secret, X-Tenant-Id, X-User-Id) as required by the application's gateway verification logic.
+```
+
+### **Key Changes**
+- Brief description of code/design changes
+- PR links (if any)
+
+### **Blockers / Risks**
+- Issue 1
+- Dependency / external blocker
+
+### **Next Steps**
+- Plan for next day
+</details>
+
+---
 <details>
 <summary><strong>🗓️ 2026-05-07 — [Status] — Short summary of the day: Create integration test for user service</strong></summary>
 

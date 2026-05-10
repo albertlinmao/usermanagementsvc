@@ -10,6 +10,7 @@ from models.schemas import (
     PaginatedUserResponse,
 )
 from services.user_service import UserService
+from services.gdpr_service import GdprService
 from core.security import verify_gateway_psk
 
 router = APIRouter(
@@ -19,6 +20,10 @@ router = APIRouter(
 
 def get_user_service(session: AsyncSession = Depends(get_db)) -> UserService:
     return UserService(session)
+
+
+def get_gdpr_service(session: AsyncSession = Depends(get_db)) -> GdprService:
+    return GdprService(session)
 
 
 @router.get("/", response_model=PaginatedUserResponse)
@@ -81,6 +86,22 @@ async def delete_user(user_id: str, service: UserService = Depends(get_user_serv
     Soft delete a user profile.
     """
     success = await service.delete_user(user_id)
+    if not success:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
+        )
+    return None
+
+
+@router.delete("/{user_id}/hard", status_code=status.HTTP_204_NO_CONTENT)
+async def hard_delete_user(
+    user_id: str, service: GdprService = Depends(get_gdpr_service)
+):
+    """
+    Hard delete a user profile (GDPR purging).
+    Replaces PII with stubs and maintains the UUID.
+    """
+    success = await service.hard_delete_user(user_id)
     if not success:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="User not found"

@@ -121,14 +121,14 @@
 
 ### Tests for User Story 4 ⚠️
 
-- [ ] T033 [P] [US4] Write tests for audit log retrieval and GDPR hard deletion in `backend/tests/integration/test_audit.py`
+- [x] T033 [P] [US4] Write tests for audit log retrieval and GDPR hard deletion in `backend/tests/integration/test_audit.py`
 
 ### Implementation for User Story 4
 
-- [ ] T034 [US4] Implement Supabase Auth Webhook handler endpoint to capture authentication events in `backend/src/api/routers/webhooks.py`
-- [ ] T035 [US4] Implement audit log retrieval repository and endpoint in `backend/src/api/routers/audit.py`
-- [ ] T036 [US4] Implement GDPR hard-delete logic (scrubbing PII) in `backend/src/services/gdpr_service.py`
-- [ ] T037 [US4] Create DELETE `/api/v1/users/{id}/hard` endpoint for GDPR purging in `backend/src/api/routers/users.py`
+- [x] T034 [US4] Implement Supabase Auth Webhook handler endpoint to capture authentication events in `backend/src/api/routers/webhooks.py`
+- [x] T035 [US4] Implement audit log retrieval repository and endpoint in `backend/src/api/routers/audit.py`
+- [x] T036 [US4] Implement GDPR hard-delete logic (scrubbing PII) in `backend/src/services/gdpr_service.py`
+- [x] T037 [US4] Create DELETE `/api/v1/users/{id}/hard` endpoint for GDPR purging in `backend/src/api/routers/users.py`
 
 ---
 

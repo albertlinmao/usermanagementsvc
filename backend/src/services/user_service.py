@@ -1,6 +1,8 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from uuid import UUID
 from typing import Optional
+from supabase import create_client, Client
+from core.config import settings
 from models.schemas import (
     UserCreateRequest,
     UserUpdateRequest,
@@ -14,6 +16,9 @@ class UserService:
     def __init__(self, session: AsyncSession):
         self.session = session
         self.repo = UserRepository(session)
+        self.supabase: Client = create_client(
+            settings.SUPABASE_URL, settings.SUPABASE_KEY
+        )
 
     async def get_users(
         self, cursor: Optional[str] = None, limit: int = 50
@@ -31,11 +36,26 @@ class UserService:
         return UserProfileResponse(**data)
 
     async def create_user(self, create_data: UserCreateRequest) -> UserProfileResponse:
-        # In a real system, we'd also register the user in Supabase Auth via Admin API
-        # Here we just create the profile and simulate UUID generation
         import uuid
+        from fastapi import HTTPException, status
 
-        user_id = uuid.uuid4()
+        # First, register the user in Supabase Auth via Admin API
+        temp_password = str(uuid.uuid4())
+        try:
+            auth_res = self.supabase.auth.admin.create_user(
+                {
+                    "email": create_data.email,
+                    "password": temp_password,
+                    "email_confirm": True,
+                }
+            )
+            user_id = UUID(auth_res.user.id)
+        except Exception as e:
+            # If user already exists in auth or other error occurs
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Failed to create user in Auth: {str(e)}",
+            )
 
         async with self.session.begin():
             data = await self.repo.create_user(
